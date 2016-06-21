@@ -1,0 +1,92 @@
+campos calculados:
+---------------------
+
+tratamiento.wi
+IF ([Year]>=2015)
+THEN [Tratamiento]
+ELSE
+[Tratamiento]*(1+[whatif.param])
+END
+
+dias.perdidos.wi
+IF ([Year]>=2015)
+THEN [Dias.Perdidos]
+ELSE
+[Dias.Perdidos]*(1+[whatif.param])
+END
+
+defunciones.wi
+IF ([Year]>=2015)
+THEN [Defunciones]
+ELSE
+[Defunciones]*(1+[whatif.param])
+END
+
+
+
+costo.tratamiento
+[tratamiento.wi]*32695*[Prop]*[Prevalencia]
+
+costo.dias.perdidos
+if([Grupo]=="70a100")
+THEN 0
+ELSE [dias.perdidos.wi]*[Ocup]*[Prop]*257.9*[Prevalencia]
+END
+
+costo.defunciones
+IF([Grupo]=="70a100")
+THEN 0
+ELSE
+[defunciones.wi]*[Ocup]*[Prop]*[Prevalencia]*(61896/(0.04-0.03)*(1-(1.03/1.04)^[Ene]))
+END
+
+
+costo.syo
+[costo.defunciones]+[costo.dias.perdidos]+[costo.tratamiento]
+
+accesibilidad.comida
+[N.restaurant]*105.588/([Pobtot]*[Ocup]*5158)
+
+accesibilidad.deporte
+[N.deporte]*1147.404/([Pobtot]*[Ocup]*5158)
+
+costo.percapita
+[costo.syo]/([Pobtot]*[Prop])
+
+costo.case
+CASE [costo.param]
+WHEN "costo.defunciones" THEN [costo.defunciones]
+WHEN "costo.dias.perdidos" then [costo.dias.perdidos]
+WHEN "costo.tratamiento" THEN [costo.tratamiento]
+WHEN "costo.syo" THEN [costo.syo]
+END
+
+
+color.mapa
+CASE [mapa.param]
+WHEN "costo.defunciones" THEN [costo.defunciones]
+WHEN "costo.dias.perdidos" then [costo.dias.perdidos]
+WHEN "costo.tratamiento" THEN [costo.tratamiento]
+WHEN "costo.syo" THEN [costo.syo]
+WHEN "poblacion.total" THEN [Pobtot]
+WHEN "escolaridad" THEN [Escolaridad]
+accesibilidad.deporte
+accesibilidad.comida
+END
+
+
+
+
+lm
+CASE [Year] 
+WHEN 2016 THEN 7888384165
+WHEN 2017 THEN 7888384165+366255414*(1+[whatif.param])
+WHEN 2018 THEN 7888384165+366255414*(1+[whatif.param])+486022997*(1+[whatif.param])
+WHEN 2019 THEN 7888384165+366255414*(1+[whatif.param])+486022997*(1+[whatif.param])+670134800*(1+[whatif.param])
+WHEN 2020 THEN 7888384165+366255414*(1+[whatif.param])+486022997*(1+[whatif.param])+670134800*(1+[whatif.param])+962551896*1+([whatif.param])
+END
+
+
+
+
+
